@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Graph App</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 40px;
+        }
+        input, button {
+            padding: 8px;
+            font-size: 16px;
+        }
+        canvas {
+            width: 600px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Weather Information Graph</h2>
+
+<input id="city" placeholder="Enter city name">
+<button onclick="getWeather()">Fetch Weather</button>
+
+<canvas id="weatherChart"></canvas>
+
+<script>
+const API_KEY = "30f9f7db82b0ae7d12df16e2ef1fc45f";
+
+// Arrow function + async/await
+const fetchWeather = async city => {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
+    const response = await fetch(url);
+    return response.json();
+};
+
+let chart;
+
+// Main function
+const getWeather = async () => {
+    const city = document.getElementById("city").value;
+
+    const data = await fetchWeather(city);
+
+    const labels = data.list.slice(0, 8).map(item => item.dt_txt);
+    const temperatures = data.list.slice(0, 8).map(item => item.main.temp);
+
+    drawGraph(labels, temperatures);
+};
+
+// Arrow function for graph
+const drawGraph = (labels, values) => {
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(document.getElementById("weatherChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Temperature (°C)",
+                data: values,
+                borderWidth: 2,
+                fill: false
+            }]
+        }
+    });
+};
+</script>
+
+</body>
+</html>
